@@ -1270,7 +1270,8 @@
           "dotnet.server.path": {
             "type": "string",
             "scope": "machine-overridable",
-            "description": "%configuration.dotnet.server.path%"
+            "description": "%configuration.dotnet.server.path%",
+            "default": "C:/Repos/roslyn-beccam/artifacts/bin/Microsoft.CodeAnalysis.LanguageServer/Debug/net7.0/Microsoft.CodeAnalysis.LanguageServer.dll"
           },
           "dotnet.server.startTimeout": {
             "type": "number",

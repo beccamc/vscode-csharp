@@ -237,6 +237,12 @@ export namespace BuildOnlyDiagnosticIdsRequest {
     export const type = new lsp.RequestType0<BuildOnlyDiagnosticIdsResult, void>(method);
 }
 
+export namespace ExtensionExampleHandler {
+    export const method = 'extensions/externalExampleHandler';
+    export const messageDirection: lsp.MessageDirection = lsp.MessageDirection.clientToServer;
+    export const type = new lsp.RequestType0<string, void>(method);
+}
+
 export namespace CodeActionFixAllResolveRequest {
     export const method = 'codeAction/resolveFixAll';
     export const messageDirection: lsp.MessageDirection = lsp.MessageDirection.clientToServer;

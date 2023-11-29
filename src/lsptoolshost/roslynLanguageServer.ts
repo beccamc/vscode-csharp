@@ -26,6 +26,7 @@ import {
     SocketMessageReader,
     MessageTransports,
     RAL,
+    CancellationToken,
 } from 'vscode-languageclient/node';
 import { PlatformInformation } from '../shared/platform';
 import { readConfigurations } from './configurationMiddleware';
@@ -109,6 +110,8 @@ export class RoslynLanguageServer {
         this.registerExtensionsChanged();
         this.registerTelemetryChanged();
 
+        this.registerFakeExtensionAction();
+
         // Register Razor dynamic file info handling
         this.registerDynamicFileInfo();
 
@@ -127,6 +130,15 @@ export class RoslynLanguageServer {
                 await this._languageClient.setTrace(languageClientTraceLevel);
             }
         });
+    }
+
+    private registerFakeExtensionAction() {
+        this._languageClient.addDisposable(
+            vscode.workspace.onDidSaveTextDocument(async () => {
+                const result = await this.getExamplExtensionInfo(CancellationToken.None);
+                _channel.append(result + '\n');
+            })
+        );
     }
 
     private registerSendOpenSolution() {
@@ -558,7 +570,7 @@ export class RoslynLanguageServer {
 
         // Timeout promise used to time out the connection process if it takes too long.
         const timeout = new Promise<undefined>((resolve, reject) => {
-            RAL().timer.setTimeout(resolve, languageServerOptions.startTimeout);
+            RAL().timer.setTimeout(resolve, 10000000);
 
             // If the child process exited unexpectedly, reject the promise early.
             // Error information will be captured from the stdout/stderr streams above.
@@ -823,6 +835,15 @@ export class RoslynLanguageServer {
         }
 
         throw new Error('Unable to retrieve build-only diagnostic ids for current solution.');
+    }
+
+    public async getExamplExtensionInfo(token: vscode.CancellationToken): Promise<string> {
+        const response = await this.sendRequest0(RoslynProtocol.ExtensionExampleHandler.type, token);
+        if (response) {
+            return response;
+        }
+
+        throw new Error('Unable to retrieve extension example for current solution.');
     }
 }
 
